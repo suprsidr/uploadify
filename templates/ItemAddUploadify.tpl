@@ -8,40 +8,27 @@
 jQuery(document).ready(function() {ldelim}
 
     jQuery("#uploadify").uploadify({ldelim}
-        'uploader'       : '{g->url href="modules/uploadify/lib/uploadify.swf"}',
-        'script'         : '{$ItemAddUploadify.submitUrl}',
-        'cancelImg'      : '{g->url href="modules/uploadify/lib/cancel.png"}',
-        'buttonImg'      : '{g->url href="modules/uploadify/lib/browseBtnFlash.png"}',
+        'swf'       : '{g->url href="modules/uploadify/lib/uploadify.swf"}',
+        'uploader'       : '{$ItemAddUploadify.submitUrl}',
+        'buttonImage'      : '{g->url href="modules/uploadify/lib/browseBtnFlash.png"}',
         'width'          : 82,
         'height'         : 24,
-        'rollover'       : true,
         'queueID'        : 'fileQueue',
-        'fileDataName'   : 'g2_userfile',
+        'fileObjName'   : 'g2_userfile',
         'auto'           : false,
-        'multi'          : true,
-        'simUploadLimit' : 4,
         'buttonText'     : '{g->text text="Select Media"}',
-        {literal}onError: function (event, queueID ,fileObj, errorObj) {
-            var msg;
-            if (errorObj.status == 404) {
-                alert('Could not find upload script.');
-                msg = 'Could not find upload script.';
-            } else if (errorObj.type === "HTTP")
-                msg = errorObj.type+": Upload Failed";
-            else if (errorObj.type ==="File Size")
-                msg = fileObj.name+'<br>'+errorObj.type+' Limit: '+Math.round(errorObj.sizeLimit/1024)+'KB';
-            else
-                msg = errorObj.type+": "+errorObj.text;
-            jQuery.jGrowl('<p></p>'+msg, {
+        {literal}onUploadError: function (file, errorCode, errorMsg, errorString) {
+            //don't notify about cancelled upload, as these already have been announced by onCancel 
+            if (errorCode == -280) return false;
+	    jQuery.jGrowl('<p></p>'+ 'The file ' + file.name + ' could not be uploaded: ' + errorString, {
                 theme:  'error',
                 header: 'ERROR',
                 sticky: true
             });
-            jQuery("#uploadify" + queueID).fadeOut(250, function() { jQuery("#uploadify" + queueID).remove()});
             return false;
         },
-        onCancel: function (a, b, c, d) {
-            var msg = "Cancelled uploading: "+c.name;
+        onCancel: function (a) {
+            var msg = "Cancelled uploading: "+ a.name;
             jQuery.jGrowl('<p></p>'+msg, {
                 theme:  'warning',
                 header: 'Cancelled Upload',
@@ -49,8 +36,8 @@ jQuery(document).ready(function() {ldelim}
                 sticky: false
             });
         },
-        onClearQueue: function (a, b) {
-            var msg = "Cleared "+b.fileCount+" files from queue";
+        onClearQueue: function (a) {
+            var msg = "Cleared "+ a +" files from queue";
             jQuery.jGrowl('<p></p>'+msg, {
                 theme:  'warning',
                 header: 'Cleared Queue',
@@ -58,14 +45,16 @@ jQuery(document).ready(function() {ldelim}
                 sticky: false
             });
         },
-        onComplete: function (a, b ,c, d, e) {
-            var size = Math.round(c.size/1024);
-            jQuery.jGrowl('<p></p>'+c.name+' - '+size+'KB', {
+        onUploadSuccess: function (file, data, response) {
+            jQuery.jGrowl('<p></p>'+ file.name, {
                 theme:  'success',
                 header: 'Upload Complete',
                 life:   4000,
                 sticky: false
             });
+	  /*onError: function (e, q, f, o) {
+    alert("ERROR: " + o.info);
+	}*/
         }{/literal}
     {rdelim});
 {rdelim});
@@ -80,8 +69,8 @@ function startUpload(id){
             values[this.name] = this.value;
         }
     });
-    jQuery('#uploadify').uploadifySettings('scriptData', values);
-    jQuery('#uploadify').uploadifyUpload();
+    jQuery('#uploadify').uploadify('settings', 'scriptData', values);
+    jQuery('#uploadify').uploadify('upload', '*');
 }
 {/literal}
   // ]]>
@@ -91,7 +80,7 @@ function startUpload(id){
     <div id="fileQueue"></div>
     <input type="file" name="uploadify" id="uploadify" />
     <input class="uploadifyButton" type="button" onclick="startUpload('uploadify');" value="{g->text text='Upload'}"/>
-    <input class="uploadifyButton" type="button" onclick="jQuery('#uploadify').uploadifyClearQueue();" value="{g->text text='Clear'}"/>
+    <input class="uploadifyButton" type="button" onclick="$('#uploadify').uploadify('cancel', '*');" value="{g->text text='Clear'}"/>
 </div>
 </form>
 <form id="uploadOptions">

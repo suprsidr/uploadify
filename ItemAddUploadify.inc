@@ -52,15 +52,15 @@ class ItemAddUploadify extends ItemAddPlugin {
         $ItemAddUploadify['submitUrl'] = $urlGenerator->generateUrl(
         array('controller' => 'uploadify.Uploadify', 'itemId' => GalleryUtilities::getRequestVariables('itemId'),
               'addPlugin' => 'ItemAddUploadify', 'authToken' => $session->getAuthToken()),
-        array('forceFullUrl' => true, 'forceSessionId' => true, 'forceDirect' => true, 'htmlEntities' => false));
+        array('forceFullUrl' => false, 'forceSessionId' => true, 'forceDirect' => true, 'htmlEntities' => false, 'forceServerRelativeUrl' => false));
         /* Oops don't forget this is for flash */
         $ItemAddUploadify['submitUrl'] = urlencode($ItemAddUploadify['submitUrl']);
 
         $template->style('modules/uploadify/lib/uploadify.css');
         $template->style('modules/uploadify/lib/uploadify.jGrowl.css');
-        $template->javascript('http://ajax.googleapis.com/ajax/libs/jquery/1.4.0/jquery.min.js');
-        $template->javascript('modules/uploadify/lib/swfobject.js');
-        $template->javascript('modules/uploadify/lib/jquery.uploadify.v2.1.0.min.js');
+        $template->javascript('http://code.jquery.com/jquery-1.7.2.min.js');
+	$template->javascript('modules/uploadify/lib/swfobject.js');
+        $template->javascript('modules/uploadify/lib/jquery.uploadify.min.js');
         $template->javascript('modules/uploadify/lib/jquery.jgrowl_minimized.js');
         $template->setVariable('ItemAddUploadify', $ItemAddUploadify);
         return array(null, 'modules/uploadify/templates/ItemAddUploadify.tpl', 'modules_uploadify');

@@ -29,7 +29,7 @@ class UploadifyModule extends GalleryModule {
         $this->setId('uploadify');
         $this->setName($gallery->i18n('Uploadify'));
         $this->setDescription($gallery->i18n('Easy to use jQuery uploader for media'));
-        $this->setVersion('1.2.0');
+        $this->setVersion('1.2.1');
         $this->_templateVersion = 1;
         $this->setGroup('import', $gallery->i18n('Import'));
         $this->setRequiredCoreApi(array(7, 20));
